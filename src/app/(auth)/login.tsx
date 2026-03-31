@@ -44,7 +44,7 @@ export default function LoginScreen() {
             </TouchableOpacity>
           </View>
 
-          <TouchableOpacity style={styles.primaryButton} activeOpacity={0.8} onPress={() => router.push("/home")}>
+          <TouchableOpacity style={styles.primaryButton} activeOpacity={0.8} onPress={() => router.push("/")}>
             <Text style={styles.primaryButtonText}>Continue</Text>
           </TouchableOpacity>
 

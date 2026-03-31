@@ -59,7 +59,7 @@ export default function OTPScreen() {
 
       {/* Footer Action */}
       <View style={styles.footerContainer}>
-        <TouchableOpacity style={styles.primaryButton} activeOpacity={0.8} onPress={() => router.push("/home")}>
+        <TouchableOpacity style={styles.primaryButton} activeOpacity={0.8} onPress={() => router.push("/")}>
           <Text style={styles.primaryButtonText}>Verify code</Text>
         </TouchableOpacity>
         <Text style={styles.footerNote}>
