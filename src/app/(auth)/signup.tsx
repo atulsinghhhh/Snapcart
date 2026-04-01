@@ -1,12 +1,30 @@
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView, Dimensions } from "react-native";
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import { useAuth } from "@/context/AuthProvider";
+import { useState } from "react";
 
-const { width } = Dimensions.get("window");
 
 export default function SignUpScreen() {
   const router = useRouter();
+  const { signUp } = useAuth();
+
+  const [name,setName] = useState("");
+  const [email,setEmail] = useState("");
+  const [phone,setPhone] = useState("");
+  const [password,setPassword] = useState("");
+
+
+  const handleSignUp = async() => {
+    try {
+      await signUp(name,phone,email,password);
+    } catch (error) {
+      Alert.alert("Error", (error as Error).message);
+    }
+  }
+
+
 
   return (
     <SafeAreaView style={styles.container}>
@@ -37,6 +55,8 @@ export default function SignUpScreen() {
                 style={styles.input}
                 placeholder="Enter your full name"
                 placeholderTextColor="#acadac"
+                onChangeText={setName}
+                value={name}
               />
             </View>
           </View>
@@ -52,6 +72,8 @@ export default function SignUpScreen() {
                 placeholderTextColor="#acadac"
                 keyboardType="email-address"
                 autoCapitalize="none"
+                onChangeText={setEmail}
+                value={email}
               />
             </View>
           </View>
@@ -69,6 +91,8 @@ export default function SignUpScreen() {
                   placeholder="00000 00000"
                   placeholderTextColor="#acadac"
                   keyboardType="phone-pad"
+                  onChangeText={setPhone}
+                  value={phone}
                 />
               </View>
             </View>
@@ -84,6 +108,8 @@ export default function SignUpScreen() {
                 placeholder="••••••••"
                 placeholderTextColor="#acadac"
                 secureTextEntry={true}
+                onChangeText={setPassword}
+                value={password}
               />
               <TouchableOpacity style={styles.eyeIcon}>
                 <MaterialIcons name="visibility" size={20} color="#5a5c5b" />
@@ -106,7 +132,7 @@ export default function SignUpScreen() {
           <TouchableOpacity 
             style={styles.primaryButton} 
             activeOpacity={0.8} 
-            onPress={() => router.push("/(auth)/login")}
+            onPress={handleSignUp}
           >
             <Text style={styles.primaryButtonText}>Create Account</Text>
           </TouchableOpacity>
