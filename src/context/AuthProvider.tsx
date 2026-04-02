@@ -46,7 +46,7 @@ export default function AuthProvider({children}: {children: React.ReactNode}) {
                 return;
             }
 
-            const { data,error } = await supabase.from('users').select("*").eq("id", signUpData?.user?.id).single();
+            const { data,error } = await supabase.from('users').select("*").eq("id", signUpData?.user?.id).maybeSingle();
             if(error){
                 Alert.alert("Error fetching user data", error.message);
                 return;
