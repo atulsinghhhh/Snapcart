@@ -99,34 +99,68 @@ export const useCustomer = () => {
             setLoading(false);
         }
     }
+    const searchProducts = async (query: string) => {
+        if (!query.trim()) return [];
+        setLoading(true);
+        try {
+            const { error, data } = await supabase.from("products")
+                .select("*")
+                .eq("is_available", true)
+                .ilike("name", `%${query}%`)
+                .order("created_at", { ascending: false });
+
+            if (error) {
+                Alert.alert("Error searching products", error.message);
+                return;
+            }
+            return data;
+        } catch (error) {
+            Alert.alert("Error searching products", (error as Error).message);
+            return;
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const applyCouponCode = async (code: string, subtotal: number) => {
+        setLoading(true);
+        try {
+            const { error, data } = await supabase.from("coupons")
+                .select("*")
+                .eq("code", code)
+                .eq("is_active", true)
+                .gt("expires_at", new Date().toISOString())
+                .single();
+
+            if (error) {
+                Alert.alert("Invalid Coupon", "This coupon does not exist or has expired.");
+                return null;
+            }
+
+            if (data && subtotal < data.min_order_value) {
+                Alert.alert("Coupon not applicable", `Minimum order value for this coupon is ${data.min_order_value}`);
+                return null;
+            }
+
+            return data;
+        } catch (error) {
+            Alert.alert("Error applying coupon", (error as Error).message);
+            return null;
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return {
+        loading,
         fetchCategory,
         fetchProduct,
         handleCategoryFilter,
         fetchAddress,
+        searchProducts,
+        applyCouponCode,
     }
 }
-
-
-/*
-
-    Product Detail → Add to Cart
-    Product Detail Screen
-
-    Receive product_id from navigation
-    Fetch single product from products table by id
-    Show image, name, price, description, stock qty
-    Quantity selector starts at 1, max = stock_qty
-
-    Add to Cart
-
-    Cart is stored in local state / AsyncStorage (not database) until checkout
-    On tap 'Add to Cart' → save { product_id, name, image, price, quantity } to local cart store
-    Show toast 'Added to cart'
-    Cart icon in tab bar shows item count badge
-
-
-*/
 
 export const useProduct = () =>{
     const [loading,setLoading] = useState(false);
@@ -153,35 +187,9 @@ export const useProduct = () =>{
         }
     }
 
-    const addToCart = async(product: any) => {
-        setLoading(true);
-        try {
-            const { error,data } = await supabase.from("cart")
-                .insert({
-                    product_id: product.id,
-                    name: product.name,
-                    image: product.image,
-                    price: product.price,
-                    quantity: product.quantity,
-                });
-            if(error){
-                Alert.alert("Error adding to cart", error.message);
-                return;
-            }
-            console.log("Product added to cart successfully", data);
-            // setCart(data);
-        } catch (error) {
-            Alert.alert("Error adding to cart", (error as Error).message);
-        } finally {
-            setLoading(false);
-        }
-    }
+    
 
     return {
         fetchProduct,
-        // addToCart,
-        loading,
-        product,
-        cart
     }
 }
